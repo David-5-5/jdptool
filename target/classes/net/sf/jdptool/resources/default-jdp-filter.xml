@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE jdp-filter PUBLIC
+       "-//SourceForge net//DTD Jdptool filter 1.0//EN"
+       "http://sourceforge.net/dtds/jdp-filter_1_0.dtd">
+	
+<!--
+	This is profiler filter configuration file used for test
+	API of profiler filter
+-->
+
+<jdp-filter name="default">
+	
+	<breaks>
+		<method	className="net.sf.jdptool.monitor.Target"
+				methodName="setName" type="over" >
+			<variable name="toTest" type="local" />
+		</method>
+
+		<line	className="net.sf.jdptool.monitor.Target"
+				line="89" type="into" >
+			<variable name="toTest" type="local" />
+		</line>
+	</breaks>
+	
+	<field className="net.sf.jdptool.monitor.Target" fieldName="name"
+		   watchType="both" />	
+	
+	<excludes packages="java.*;javax.*" />
+	
+	<snapshot interval="10000" />
+
+</jdp-filter>

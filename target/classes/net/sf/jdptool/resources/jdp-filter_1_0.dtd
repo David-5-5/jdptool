@@ -1,0 +1,183 @@
+<!--
+     DTD for the Jdptool filter File
+
+     To support validation of your configuration file, include the following
+     DOCTYPE element at the beginning (after the "xml" declaration):
+
+     <!DOCTYPE jdp-filter PUBLIC
+       "-//SourceForge net//DTD Jdptool filter 1.0//EN"
+       "http://www.future.org/dtds/jdp-filter_1_0.dtd">
+-->
+
+<!-- ========== Defined Types ============================================= -->
+
+<!-- A "Boolean" is the string representation of a boolean (true or false)
+     variable.
+-->
+<!ENTITY % Boolean "(true|false|yes|no)">
+
+<!-- An "Integer" is a character string consisting solely of numeric digits,
+     optionally preceeded by a minus sign, that can be converted to a
+     32-bit integer.
+-->
+<!ENTITY % Integer "CDATA">
+
+
+<!-- A "Time" time format date, such as yyyy-mm-dd hh:MM:ss.
+-->
+<!ENTITY % Time "CDATA">
+
+
+<!-- A "StepType" is the string representation of a step
+-->
+<!ENTITY % StepType "(into|return|over)">
+
+<!-- A "ClassName" is the fully qualified name of a Java class that is
+     instantiated to provide the functionality of the enclosing element.
+-->
+<!ENTITY % ClassName "CDATA">
+
+
+<!-- A "MethodName" is the identifier of a method name of class.
+-->
+<!ENTITY % MethodName "CDATA">
+
+
+<!-- A "PropName" is the name of a JavaBeans property, and must begin with
+     a lower case letter and contain only characters that are legal in a
+     Java identifier.
+-->
+<!ENTITY % FieldName "CDATA">
+
+
+<!-- A "ScopeType" is the variable scope in the class, field is the member
+	 variable of class, static is static member of class, local is local
+	 variable in a method
+-->
+<!ENTITY % ScopeType "(field|static|local)">
+
+
+<!-- A "WatchType" is the notification of diffrent actions to field. "access"
+	 is relate to AccessWatchpointEvent/Request; "modify" is realte to 
+	 ModificationWatchpointEvent/Request. It follow JDI field's request/event.
+-->
+<!ENTITY % WatchType "(access|modify|both)">
+
+
+<!-- =================== Top Level Elements =============================== -->
+<!-- The "profiler-filter" element is the root of the rules file
+     hierarchy, and contains nested elements for all of the other
+     configuration settings. The following attributes are defined:
+     
+     name	The identfier of a profiler rule file
+-->
+<!ELEMENT jdp-filter (breaks?, field*, timing*, excludes)>
+<!ATTLIST jdp-filter    	name		ID					#IMPLIED>
+
+
+<!-- The "breaks" element is the configuration of breakpoint, there can be
+	 a method, line etc.
+-->
+<!ELEMENT breaks (method?, line?)>
+
+
+<!-- The "fields" element is the configuration of watchpoint, The following
+	 attributes are defined:
+	 
+	 className	The target class which contain specified field name.
+	 			["net.sf.jdptool.monitor.Target"]
+	 
+	 fieldName	The target field which contained in specified class name
+	 			would be monitor
+	
+	 watchType	The Aceess or Modification event/request relate to the field
+	 
+-->
+<!ELEMENT field EMPTY >
+<!ATTLIST field				className	%ClassName;			#IMPLIED>
+<!ATTLIST field				fieldName	%FieldName;			#IMPLIED>
+<!ATTLIST field				watchType	%WatchType;			#IMPLIED>
+
+
+<!-- The "timing" element is the configuration of time for profiler, 
+-->
+<!ELEMENT timing EMPTY >
+<!ATTLIST timing			from		%Time;			    #IMPLIED>
+<!ATTLIST timing			to			%Time;			    #IMPLIED>
+
+
+<!-- The "excludes" element is the configuration of exclude package
+	 for monitor or profiler. 
+-->
+<!ELEMENT excludes EMPTY >
+<!ATTLIST excludes			packages	CDATA			    #IMPLIED>
+
+
+<!-- The "method" element is the configuration of breakpoint corresponding
+	 to method for profiler, The following attributes are defined:
+	 
+	 className	The target class which contain specified method name.
+	 			["net.sf.jdptool.monitor.Target"]
+	 
+	 methodName	The target method which contained in specified class name.
+	 
+	 type		The step type which the method be breaked in JVM
+	 
+	 cascade	The cascade attribute is validate only when type value
+	 			is "into", if cascade is true, it will step into the
+	 			methods which the specified method invocate
+-->
+<!ELEMENT method (variable*) >
+<!ATTLIST method			className	%ClassName;		#REQUIRED>
+<!ATTLIST method			methodName	%MethodName;	#REQUIRED>
+<!ATTLIST method			type		%StepType;		#REQUIRED>
+<!ATTLIST method			cascade		%Boolean;		#IMPLIED>
+
+
+<!-- The "line" element is the configuration of breakpoint for profiler,
+	 the following attributes are defined:
+	 
+	 className	The target class which contain specified line number.
+	 			["net.sf.jdptool.monitor.Target"]
+	 
+	 number		The line number which the method be breaked in JVM
+	 
+	 type		The step type which the method be breaked in JVM
+	 
+	 cascade	The cascade attribute is validate only when type value
+	 			is "into", if cascade is true, when specified line invocate
+	 			methods, it will step into methods cascade
+-->
+<!ELEMENT line (variable*) >
+<!ATTLIST line				className	%ClassName;		#REQUIRED>
+<!ATTLIST line				line		%Integer;		#REQUIRED>
+<!ATTLIST line				type		%StepType;		#REQUIRED>
+<!ATTLIST line				cascade		%Boolean;		#IMPLIED>
+
+
+<!-- The "variable" element is the configuration to get value of
+	 specified variable; if variable is invisible ignore it. The
+	 following attribute are defined:
+	 
+	 className	The target class which contain specified class member
+	 			variable.
+	 			["net.sf.jdptool.monitor.Target"]
+	 
+	 name		The identifier of variable
+	 
+	 type		The type of variable.
+	 
+	 index		When the variable is a array or collection, it only
+	 			log the value of "name[index]", if index is -1, it
+	 			should log all values of collection
+	 
+	 key		When the variable is a map, it only log the value of key,
+	 			if key is null, it should log all values of map
+-->	 
+	 	 
+<!ELEMENT variable EMPTY >
+<!ATTLIST variable			className	%ClassName;		#IMPLIED>
+<!ATTLIST variable			name		%FieldName;		#REQUIRED>
+<!ATTLIST variable			type		%ScopeType;		#REQUIRED>
+<!ATTLIST variable			index		%Integer;		#IMPLIED>
+<!ATTLIST variable			key			CDATA			#IMPLIED>
