@@ -15,7 +15,7 @@ package net.sf.jdptool;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class PrintRecord implements HandleRecord {
 
@@ -27,7 +27,7 @@ public class PrintRecord implements HandleRecord {
         throw new UnsupportedOperationException("save method not supported");
     }
 
-    public Collection<Record> search(Predicate predicate) {
+    public Collection<Record> search(Predicate<Record> predicate) {
         throw new UnsupportedOperationException("search method not supported");
     }
 

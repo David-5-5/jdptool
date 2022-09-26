@@ -407,8 +407,8 @@ public class EventHandlerRunner extends Thread
 
         // Create Access/Modification field watchpoints by filter config
         List<Field> fields = event.referenceType().allFields();
-        for (Iterator it = fields.iterator(); it.hasNext();) {
-            Field field = (Field) it.next();
+        for (Iterator<Field> it = fields.iterator(); it.hasNext();) {
+            Field field = it.next();
             String type = filterField(className, field);
             if (type == null) {
                 continue;
@@ -452,8 +452,8 @@ public class EventHandlerRunner extends Thread
                 int lineNumber = Integer.valueOf(breaks.getLine(i).getProperty("line"));
                 try {
                     List<Location> locations = event.referenceType().locationsOfLine(lineNumber);
-                    for (Iterator it = locations.iterator(); it.hasNext(); ) {
-                        Location current = (Location) it.next();
+                    for (Iterator<Location> it = locations.iterator(); it.hasNext(); ) {
+                        Location current = it.next();
                         BreakpointRequest bpReq = mgr.createBreakpointRequest(current);
                         bpReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
                         bpReq.enable();

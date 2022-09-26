@@ -54,7 +54,7 @@ public class BreakConfig extends BasicConfig {
      * Get all <code>BreakConfig</code> variables
      * @return
      */
-    public List getVariables() {
+    public List<BasicConfig> getVariables() {
         return Collections.unmodifiableList(variables);
     }
 

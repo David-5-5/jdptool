@@ -63,7 +63,7 @@ public class BreaksConfig extends BasicConfig {
      * Get all <code>BreakConfig</code> of methods
      * @return
      */
-    public List getMethods() {
+    public List<BreakConfig> getMethods() {
         return Collections.unmodifiableList(methods);
     }
 
@@ -96,7 +96,7 @@ public class BreaksConfig extends BasicConfig {
      * Get all <code>BreakConfig</code> lines
      * @return
      */
-    public List getLines() {
+    public List<BreakConfig> getLines() {
         return Collections.unmodifiableList(lines);
     }
 

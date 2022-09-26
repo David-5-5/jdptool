@@ -122,7 +122,7 @@ public abstract class AbstractConfig implements Serializable {
 
         // Inherit forward properties
         Properties baseProperties = baseConfig.getProperties();
-        Enumeration keys = baseProperties.propertyNames();
+        Enumeration<?> keys = baseProperties.propertyNames();
 
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
@@ -143,7 +143,7 @@ public abstract class AbstractConfig implements Serializable {
     protected Properties copyProperties() {
         Properties copy = new Properties();
 
-        Enumeration keys = properties.propertyNames();
+        Enumeration<?> keys = properties.propertyNames();
 
         while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();

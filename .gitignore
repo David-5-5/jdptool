@@ -1,0 +1,93 @@
+######################################################################
+# Build Tools
+
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+######################################################################
+# IDE
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### Eclipse ###
+**/.settings/
+*/.classpath
+*/.project
+*.classpath
+*.project
+*.prefs
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### JRebel ###
+rebel.xml
+
+### NetBeans ###
+nbproject/private/
+build/*
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+### Compiled class file ###
+*.class
+
+######################################################################
+# Others
+*.log
+**/logs/
+**/log/
+*.xml.versionsBackup
+*.swp
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+*.pid
+*.orig
+temp/
+
+# Mac
+.DS_Store
+
+!*/build/*.java
+!*/build/*.html
+!*/build/*.xml
+######################################################################
+### 常用命令 ###
+#.gitignore只能忽略那些原来没有被track的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。
+#解决方法就是先把本地缓存删除（改变成未track状态），然后再提交
+#git rm -r --cached .
+#git add .
+#git commit -m "update .gitignore"
+#git push origin master #可选，如果需要同步到remote上的话
+
+#可以用-f强制添加到Git,跳过.gitignore忽略的规则
+#git add -f App.class
+
+#使用git check-ignore命令文件是被哪个规则忽略
+#git check-ignore -v App.class
+
+#Gitee更新代码提示:master has no tracked branch 执行下方命令即可解决
+#git branch --set-upstream-to=origin/master
+#如果使用git branch进行关联时报错，则先执行
+#git pull origin master --allow-unrelated-histories
+
+#### vscode plugins
+.VSCodeCounter/*
+

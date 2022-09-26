@@ -15,7 +15,7 @@ package net.sf.jdptool;
 
 import java.util.Collection;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public interface HandleRecord {
     
@@ -23,5 +23,5 @@ public interface HandleRecord {
     
     public void save(Collection<Record> records);
 
-    public Collection<Record> search(Predicate predicate);
+    public Collection<Record> search(Predicate<Record> predicate);
 }

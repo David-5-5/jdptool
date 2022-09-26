@@ -116,7 +116,7 @@ public class FilterConfig extends BasicConfig {
      * Get all <code>BasicConfig</code> of timings
      * @return
      */
-    public List getTimings() {
+    public List<BasicConfig> getTimings() {
         return Collections.unmodifiableList(timings);
     }
 

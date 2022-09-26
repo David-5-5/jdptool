@@ -195,9 +195,9 @@ public class JdpMonitor implements ConfigConstants {
         if (outputs == null) {
             return;
         }
-        for (Iterator it = outputs.values().iterator(); it.hasNext();) {
+        for (Iterator<OutputStream> it = outputs.values().iterator(); it.hasNext();) {
             try {
-                ((OutputStream) it.next()).close();
+                it.next().close();
             } catch (IOException e) {
                 log.error("Close log file error", e);
             }

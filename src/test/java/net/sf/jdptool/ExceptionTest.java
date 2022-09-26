@@ -31,11 +31,11 @@ public class ExceptionTest {
         int count = 0;
         
         while(true) {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[102400];
             list.add(buffer);
             if (++count % 100 == 0) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -74,8 +74,8 @@ public class ExceptionTest {
         while (true) {
             System.out.println("Continue....");
             try {
-                Thread.sleep(3000);
-                test.list.add(new byte[1024]);
+                Thread.sleep(30);
+                test.list.add(new byte[102400]);
                 System.out.println("Free Memory   : " + Runtime.getRuntime().freeMemory());
                 System.out.println("Total Memory  : " + Runtime.getRuntime().totalMemory());
                 System.out.println("Max Memory    : " + Runtime.getRuntime().maxMemory());

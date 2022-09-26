@@ -167,8 +167,8 @@ public final class JdpConnector {
      * @return
      */
     private Connector findConnector(String name) {
-        List connectors = Bootstrap.virtualMachineManager().allConnectors();
-        Iterator iter = connectors.iterator();
+        List<Connector> connectors = Bootstrap.virtualMachineManager().allConnectors();
+        Iterator<Connector> iter = connectors.iterator();
         while (iter.hasNext()) {
             Connector connector = (Connector) iter.next();
             if (connector.name().equals(name)) {
