@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE jdp-config PUBLIC
+       "-//SourceForge net//DTD Jdptool config 1.0//EN"
+       "http://sourceforge.net/dtds/jdp-config_1_0.dtd">       
+<!--
+	This is profiler configuration file used for test
+	API of profiler filter
+-->
+
+<jdp-config filterDir="${jdptool.home}\runtime\conf" logDir="${jdptool.home}\runtime\log" >
+
+	<snapshot interval="10000" />
+	
+</jdp-config>
