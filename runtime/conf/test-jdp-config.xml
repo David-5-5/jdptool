@@ -8,8 +8,8 @@
 	API of profiler filter
 -->
 
-<jdp-config filterDir="${jdptool.home}\runtime\conf" logDir="${jdptool.home}\runtime\log" >
+<jdp-config filterDir="D:\workbench\Dev\jdptool\runtime\conf" logDir="D:\workbench\Dev\jdptool\runtime\log" >
 
-	<snapshot interval="10000" />
+	<snapshot interval="100000" />
 	
 </jdp-config>

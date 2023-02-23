@@ -2,7 +2,7 @@
 
 <!DOCTYPE jdp-filter PUBLIC
        "-//SourceForge net//DTD Jdptool filter 1.0//EN"
-       "http://sourceforge.net/dtds/jdp-filter_1_0.dtd">
+       "./jdp-filter_1_0.dtd">
 	
 <!--
 	This is profiler filter configuration file used for test

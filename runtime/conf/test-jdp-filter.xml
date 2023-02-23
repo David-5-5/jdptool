@@ -12,18 +12,18 @@
 <jdp-filter name="default">
 	
 	<breaks>
-		<method	className="net.sf.jdptool.Target"
-				methodName="setName" type="over" >
-			<variable name="toTest" type="local" />
+		<method	className="com.cmri.quickdial.sqlServer123.service.AntiHarassService"
+				methodName="requestConfigure" type="over" >
+			<variable name="resp" type="local" />
 		</method>
 
-		<line	className="net.sf.jdptool.TestBean"
-				line="16" type="into" >
-			<variable name="name" type="local" />
+		<line className="com.cmri.quickdial.sqlServer123.service.AntiHarassService"
+				line="119" type="into" >
+			<variable name="*" type="local" />
 		</line>
 	</breaks>
 	
-	<field className="net.sf.jdptool.TestBean" fieldName="name"
+	<field className="com.cmri.quickdial.sqlServer123.service.AntiHarassService" fieldName="antiSendUrl"
 		   watchType="both" />	
 	
 	<excludes packages="java.*;javax.*" />

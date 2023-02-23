@@ -15,10 +15,14 @@ package net.sf.jdptool;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import net.sf.jdptool.config.JdpConfig;
 import net.sf.jdptool.config.JdpRuleSet;
 
 public final class JdpEntry {
+    private static Log log = LogFactory.getLog(JdpEntry.class);
     
     /**
      * Jdptool Entry : main
@@ -40,7 +44,7 @@ public final class JdpEntry {
                 DigesterHelper helper = new DigesterHelper();
                 helper.addRuleSet(new JdpRuleSet());
                 String configFileName = args[++inx];
-                System.out.println("Try to load config file " + configFileName);
+                log.info("Try to load config file " + configFileName);
                 File configFile = new File(configFileName);
                 if (configFile.exists()) {
                     try {

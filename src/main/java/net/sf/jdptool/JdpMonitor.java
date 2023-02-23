@@ -126,6 +126,7 @@ public class JdpMonitor implements ConfigConstants {
         File logDir = RecordWriter.getLogDir(jdpConfig);
 
         String fileName = vm.name() + "_" + new Date().getTime() + ".log";
+        log.info("Create log file: " + fileName);
         File logFile = new File(logDir, fileName);
         
         try {
@@ -145,7 +146,7 @@ public class JdpMonitor implements ConfigConstants {
      *        contains output stream
      * @return
      */
-    protected synchronized OutputStream outputStream(ThreadReference thread) {
+    protected synchronized OutputStream outputStream(String type, ThreadReference thread) {
         if (outputs == null) {
             outputs = new HashMap<ThreadReference, OutputStream>();
         }
@@ -155,7 +156,7 @@ public class JdpMonitor implements ConfigConstants {
 
         File logDir = RecordWriter.getLogDir(jdpConfig);
 
-        String fileName = thread.name() + "_" + new Date().getTime() + ".log";
+        String fileName = type + "_" + thread.name() + "_" + new Date().getTime() + ".log";
         File logFile = new File(logDir, fileName);
         try {
             outputs.put(thread, new FileOutputStream(logFile));
@@ -224,6 +225,7 @@ public class JdpMonitor implements ConfigConstants {
             
             for (int i = 0; i < files.length; i++) {
                 try {
+                    log.info("Load filter " + files[i]);
                     filterConfig = (FilterConfig)helper.parse(files[i]);
                 } catch (Exception e) {
                     log.info("Can't Load filter file:" +

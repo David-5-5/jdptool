@@ -70,9 +70,11 @@ public final class RecordWriter {
      */
     public static void write(OutputStream out, int frameCount, String message) {
         StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < frameCount; i++) {
-            sb.append("|\t");
-        }
+        Boolean indent = false;
+        if (indent)
+            for (int i = 0; i < frameCount; i++) 
+                sb.append("|\t");
+        
         sb.append(message);
         write(out, sb.toString());
     }

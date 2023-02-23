@@ -16,11 +16,14 @@ package net.sf.jdptool;
 import java.util.Collection;
 
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PrintRecord implements HandleRecord {
+    private static Log log = LogFactory.getLog(PrintRecord.class);
 
     public void save(Record record) {
-        System.out.println(record);
+        log.info(record);
     }
 
     public void save(Collection<Record> records) {

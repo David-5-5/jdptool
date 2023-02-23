@@ -12,7 +12,7 @@ set TRACE_PARAM=-config %CONFIG_DIR%\test-jdp-config.xml
 set JAVA_OPTS=-Djdptool.home=%PROFILER_HOME%
 
 if not "%JAVA_HOME%"=="" goto jdkset
-set JAVA_HOME="D:\Java\J2sdkse16"
+set JAVA_HOME="C:\Program Files\Java\jdk1.8.0_301"
 
 :jdkset
 rem set classpath

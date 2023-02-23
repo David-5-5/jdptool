@@ -19,11 +19,10 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import net.sf.jdptool.config.BreaksConfig;
 
 import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.lang.StringUtils;
@@ -35,9 +34,14 @@ import com.sun.jdi.Field;
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.LocalVariable;
 import com.sun.jdi.Location;
+import com.sun.jdi.ObjectReference;
+import com.sun.jdi.PrimitiveValue;
+import com.sun.jdi.ReferenceType;
 import com.sun.jdi.StackFrame;
+import com.sun.jdi.StringReference;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VMDisconnectedException;
+import com.sun.jdi.Value;
 import com.sun.jdi.event.AccessWatchpointEvent;
 import com.sun.jdi.event.BreakpointEvent;
 import com.sun.jdi.event.ClassPrepareEvent;
@@ -63,14 +67,13 @@ import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.ClassUnloadRequest;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
-import com.sun.jdi.request.ExceptionRequest;
-import com.sun.jdi.request.MethodEntryRequest;
-import com.sun.jdi.request.MethodExitRequest;
 import com.sun.jdi.request.ModificationWatchpointRequest;
-import com.sun.jdi.request.StepRequest;
 import com.sun.jdi.request.ThreadDeathRequest;
 import com.sun.jdi.request.ThreadStartRequest;
 import com.sun.jdi.request.VMDeathRequest;
+
+import net.sf.jdptool.config.BreakConfig;
+import net.sf.jdptool.config.BreaksConfig;
 
 public class EventHandlerRunner extends Thread
         implements EventHandler, Constants {
@@ -126,12 +129,12 @@ public class EventHandlerRunner extends Thread
         vmdReq.enable();
 
         // Set exception request and suspend all, so we can step it
-        ExceptionRequest exReq = eqmr.createExceptionRequest(null, true, true);
-        for (int i = 0; i < excludes.length; i++) {
-            exReq.addClassExclusionFilter(excludes[i]);
-        }
-        exReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        exReq.enable();
+        // ExceptionRequest exReq = eqmr.createExceptionRequest(null, true, true);
+        // for (int i = 0; i < excludes.length; i++) {
+        //     exReq.addClassExclusionFilter(excludes[i]);
+        // }
+        // exReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+        // exReq.enable();
 
         // Set Thread start request
         ThreadStartRequest tsReq = eqmr.createThreadStartRequest();
@@ -143,8 +146,8 @@ public class EventHandlerRunner extends Thread
         tdReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
         tdReq.enable();
 
-        // Set ClassPrepare request, so we can set watchpoint and step
-        // request if needed
+        // // Set ClassPrepare request, so we can set watchpoint and step
+        // // request if needed
         ClassPrepareRequest cpReq = eqmr.createClassPrepareRequest();
         for (int i = 0; i < excludes.length; i++) {
             cpReq.addClassExclusionFilter(excludes[i]);
@@ -163,21 +166,23 @@ public class EventHandlerRunner extends Thread
 
         // Want all method entry request, suspend it so we can capture
         // as more as runtime information
-        MethodEntryRequest menReq = eqmr.createMethodEntryRequest();
-        for (int i = 0; i < excludes.length; ++i) {
-            menReq.addClassExclusionFilter(excludes[i]);
-        }
-        menReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        menReq.enable();
+        // MethodEntryRequest menReq = eqmr.createMethodEntryRequest();
+        // for (int i = 0; i < excludes.length; ++i) {
+        //     menReq.addClassExclusionFilter(excludes[i]);
+        // }
+        // menReq.setSuspendPolicy(EventRequest.SUSPEND_NONE);
+        // menReq.enable();
 
-        // Want all method exit request, suspend it so we can capture
-        // as more as runtime information
-        MethodExitRequest mexReq = eqmr.createMethodExitRequest();
-        for (int i = 0; i < excludes.length; ++i) {
-            mexReq.addClassExclusionFilter(excludes[i]);
-        }
-        mexReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
-        mexReq.enable();
+        // // Want all method exit request, suspend it so we can capture
+        // // as more as runtime information
+        // MethodExitRequest mexReq = eqmr.createMethodExitRequest();
+        // for (int i = 0; i < excludes.length; ++i) {
+        //     mexReq.addClassExclusionFilter(excludes[i]);
+        // }
+        // mexReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+        // mexReq.enable();
+        
+        setBreakpoints();
 
         log.debug("End event request initilizatoin");
     }
@@ -301,6 +306,16 @@ public class EventHandlerRunner extends Thread
         return null;
     }
 
+    private List<BasicConfig> filterVariables(String className, int lineNumber) {
+        List<BreakConfig> lines = monitor.filterConfig.getBreaks().getLines();
+        for (int i=0; i<lines.size(); i++) {
+            if (StringUtils.equals(className, lines.get(i).getProperty("className"))
+                && lineNumber == Integer.valueOf(lines.get(i).getProperty("line")))
+                return lines.get(i).getVariables();
+        }
+        return new LinkedList<BasicConfig>();
+    }
+
     /**
      * Check whether class name match the excludes's regular
      * expression
@@ -358,7 +373,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void breakpointEvent(BreakpointEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("BreakpointEvent", event.thread());
         StringBuffer sb = new StringBuffer();
         sb.append("Breakpiont at location[");
         sb.append(event.location() + "];");
@@ -366,36 +381,71 @@ public class EventHandlerRunner extends Thread
         try {
             // Get the current StackFrame, index is zero.
             StackFrame stack = event.thread().frame(0);
-            List<LocalVariable> variables = stack.visibleVariables();
-            sb.append("Local variable[");
-            for (int i = 0; i < variables.size(); i++) {
-                sb.append(variables.get(i).name() + "=");
-                sb.append(stack.getValue(variables.get(i)) + ";");
+            List<BasicConfig> varConf = filterVariables(event.location().declaringType().name(), event.location().lineNumber());
+            //List<LocalVariable> variables = stack.visibleVariables();
+            sb.append("\n\tLocal variable[\n");
+            
+            if (varConf.size() > 0) {
+                String name = varConf.get(0).getProperty("name");
+                if ("ALL".equals(name) || "*".equals(name)) {
+                    List<LocalVariable> variables = stack.visibleVariables();
+                    for (int i = 0; i < variables.size(); i++) {
+                        sb.append("\n\t\t" + variables.get(i).name() + "=");
+                        formatterVariables(stack, sb, "\t\t", stack.getValue(variables.get(i)), 0);
+                    }
+                } else{
+                    for (int i = 0; i < varConf.size(); i++) {
+                        LocalVariable variable = stack.visibleVariableByName(varConf.get(i).getProperty("name"));
+                        sb.append("\n\t\t" + variable.name() + "=");
+                        formatterVariables(stack, sb, "\t\t", stack.getValue(variable), 0);
+                    }
+                }
             }
-            sb.append("]");
+            
+            sb.append("\n\t]");
         } catch (Exception e) {
             log.error("Handle breakpoint event error", e);
         }
 
-        EventRequestManager mgr = monitor.vm.eventRequestManager();
-        StepRequest request = mgr.createStepRequest(event.thread(),
-                                                    StepRequest.STEP_LINE,
-                                                    StepRequest.STEP_OVER);
-        request.addCountFilter(1);
-        request.enable();
+        // EventRequestManager mgr = monitor.vm.eventRequestManager();
+        // StepRequest request = mgr.createStepRequest(event.thread(),
+        //                                             StepRequest.STEP_LINE,
+        //                                             StepRequest.STEP_OVER);
+        // request.addCountFilter(1);
+        // request.enable();
         
         RecordWriter.write(out, getFrameCount(event.thread()) + 1,
                            sb.toString());
 
     }
 
+    private void formatterVariables(StackFrame stack, StringBuffer sb, String prefix, Value value, int depth) {
+        if (value instanceof PrimitiveValue ) {
+            sb.append(((PrimitiveValue) value).longValue() + "\n");
+        } else if (value instanceof StringReference) {
+            sb.append(value + "\n");
+        } else if (value instanceof ObjectReference) {
+            sb.append(value + "\n");
+            if (depth <= 1) {
+                ObjectReference objValue = (ObjectReference) value;
+                List<com.sun.jdi.Field> fields = objValue.referenceType().allFields();
+                for (int i = 0; i < fields.size(); i++) {
+                    sb.append(prefix + "|--" + fields.get(i).name() + "=");
+                    formatterVariables(stack, sb, prefix + "|--", objValue.getValue(fields.get(i)), depth + 1);
+                }
+            }
+        } else {
+            sb.append(value + "\n");
+        }
+    }
+
     /**
-     * Handle class prepare event. When A new class has been loaded. Set
-     * watchpoints, breakpionts by Jdptool filter config file.
+     *createStepRequest
      * 
      * @param event
      */
     public void classPrepareEvent(ClassPrepareEvent event) {
+        
         RecordWriter.write(monitor.vmOutput, "Class " +
                            event.referenceType().name() + " have been loaded");
         String className = event.referenceType().name();
@@ -465,6 +515,34 @@ public class EventHandlerRunner extends Thread
         }
     }
 
+    private void setBreakpoints() {
+        BreaksConfig breaks = monitor.filterConfig.getBreaks();
+        EventRequestManager erm = monitor.vm.eventRequestManager();
+        for (int i = 0; i < breaks.lineSize(); i++) {
+            String className = breaks.getLine(i).getProperty("className");
+            int lineNumber = Integer.valueOf(breaks.getLine(i).getProperty("line"));
+            try {
+
+                List<ReferenceType> referenceTypes = monitor.vm.classesByName(className);
+                if (referenceTypes.size() == 0) {
+                    throw new RuntimeException("Cann't Load class " + className);
+                }
+                List<Location> locations = referenceTypes.get(0).locationsOfLine(lineNumber);
+                if (locations.size() == 0) {
+                    throw new RuntimeException("Cann't locate the line number " + lineNumber + " of " + className);
+                }
+                
+                BreakpointRequest bpReq = erm.createBreakpointRequest(locations.get(0));
+                bpReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
+                bpReq.enable();
+            } catch (AbsentInformationException e) {
+                log.error("Class Prepeared error", e);
+            }
+            log.info("Set the breakpoint of " + className + " in line " + lineNumber);
+        }
+    }
+
+
     /**
      * Handle class unload event
      * 
@@ -481,7 +559,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void exceptionEvent(ExceptionEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("ExceptionEvent", event.thread());
 
         StringBuffer sb = new StringBuffer();
         sb.append("location[");
@@ -499,7 +577,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void fieldWatchEvent(WatchpointEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("FieldWatchEvent", event.thread());
         
         StringBuffer sb = new StringBuffer(event.location().toString());
         sb.append(":" + event.field().name());
@@ -520,7 +598,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void methodEntryEvent(MethodEntryEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("MethodEntryEvent", event.thread());
         
         StringBuffer sb = new StringBuffer(event.method().name());
         sb.append(" method entry.");
@@ -537,7 +615,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void methodExitEvent(MethodExitEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("MethodExitEvent", event.thread());
         
         StringBuffer sb = new StringBuffer(event.method().name());
         sb.append(" method exit. elapse ");
@@ -558,7 +636,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void stepEvent(StepEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("StepEvent", event.thread());
         StringBuffer sb = new StringBuffer();
         sb.append("Step at location[");
         sb.append(event.location() + "];");
@@ -590,7 +668,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void threadDeathEvent(ThreadDeathEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("ThreadDeathEvent", event.thread());
         StringBuffer sb = new StringBuffer();
         sb.append("Thread ");
         sb.append(event.thread().name());
@@ -607,7 +685,7 @@ public class EventHandlerRunner extends Thread
      * @param event
      */
     public void threadStartEvent(ThreadStartEvent event) {
-        OutputStream out = monitor.outputStream(event.thread());
+        OutputStream out = monitor.outputStream("threadStartEvent", event.thread());
 
         StringBuffer sb = new StringBuffer();
         sb.append("Thread ");
