@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 
-<!DOCTYPE jdp-filter PUBLIC
-       "-//SourceForge net//DTD Jdptool filter 1.0//EN"
-       "./jdp-filter_1_0.dtd">
+<!DOCTYPE jdp-filter SYSTEM "jdp-filter_1_0.dtd">
 	
 <!--
 	This is profiler filter configuration file used for test
@@ -28,6 +26,5 @@
 	
 	<excludes packages="java.*;javax.*" />
 	
-	<snapshot interval="10000" />
 
 </jdp-filter>

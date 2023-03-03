@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 
-<!DOCTYPE jdp-config PUBLIC
-       "-//SourceForge net//DTD Jdptool config 1.0//EN"
-       "http://sourceforge.net/dtds/jdp-config_1_0.dtd">       
+<!DOCTYPE jdp-config SYSTEM "jdp-config_1_0.dtd">       
 <!--
 	This is profiler configuration file used for test
 	API of profiler filter
 -->
 
-<jdp-config filterDir="D:\workbench\Dev\jdptool\runtime\conf" logDir="D:\workbench\Dev\jdptool\runtime\log" >
+<jdp-config filterDir="/home/luming/workspace/tools/jdptool/runtime/conf" logDir="/home/luming/workspace/tools/jdptool/runtime/log" >
 
 	<snapshot interval="100000" />
 	
